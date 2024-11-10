@@ -1,5 +1,77 @@
 ---
 title: "p8105_hw5_xl3495"
 author: "Xueting Li"
-Date: 2024-11-09
+date: "2024-11-09"
+output: github_document
 ---
+
+```{r}
+library(tidyverse)
+library(rvest)
+```
+
+# Problem 1
+
+Birthday generator function
+```{r}
+birthday_draw = function(n) {
+  random_birthdays = sample(1:365, n, replace = TRUE)
+  
+  duplicates = duplicated(random_birthdays)
+  
+  result =  any(duplicates)
+  
+  return(result)
+}
+```
+
+Simulations
+```{r}
+simulation = function(group_size, trials = 10000){
+  p = map_dbl(group_size, function(n){
+    
+    results = replicate(trials, birthday_draw(n))
+    
+    return(mean(results))
+  })
+  
+  return(p)
+}
+
+probs = simulation(2:50)
+
+probs
+```
+
+
+
+```{r}
+df = data.frame(
+  group_size = 2:50,
+  probability = probs
+)
+
+# Plot the probabilities using ggplot2
+ggplot(df, aes(x = group_size, y = probability)) +
+  geom_point(color = "blue", size = 3) +       # Add points for each group size
+  geom_line(color = "blue", lwd = 1) +          # Add a line connecting the points
+  labs(
+    title = "Probability of At Least Two People Sharing a Birthday",
+    x = "Group Size",
+    y = "Probability of Shared Birthday"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12)
+  ) +
+  scale_x_continuous(breaks = seq(2, 50, by = 2)) +  # Customize x-axis labels
+  scale_y_continuous(labels = scales::percent) 
+```
+It turns out that as the group size goes larger and larger, the probability of at least two people sharing a birthday converges to 1. In other words, it is very likely to (almost must) have two people with the same birthday when randomly select over 50 people.
+
+#
+
+
